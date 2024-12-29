@@ -1,0 +1,22 @@
+{% extends 'home/base.html' %}
+{% block head %}
+{% endblock head %}
+{% block content %}
+{% include 'include/alert.html' %}
+<div>
+    welcome - {{shope.owner_name}}
+</div>
+
+{% include 'include/owner/owner_menu.html' %}
+<br>
+<div class="container">
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <a type="button" class="btn btn-primary" href="{% url 'daly_report' %}">Download Daly Pdf</a>
+        <a type="button" class="btn btn-primary" href="{% url 'daly_report' %}"><i class="fa fa-download" aria-hidden="true"></i></a>
+    </div>
+</div>
+<br>
+<hr>
+
+
+{% endblock content %}

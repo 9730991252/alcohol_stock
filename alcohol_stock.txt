@@ -1,0 +1,199 @@
+103.150.136.82
+  
+
+103.150.136.82
+_______________________________________
+
+cd alcohol_stock
+git pull
+source venv/bin/activate
+python3 manage.py makemigrations
+python3 manage.py migrate
+systemctl daemon-reload
+systemctl restart alcohol_stock.com.gunicorn
+exit
+
+root
+cd alcohol_stock
+git pull
+systemctl daemon-reload
+systemctl restart alcohol_stock.com.gunicorn
+exit
+
+
+
+_______________________________________
+
+
+git clone https://github.com/9730991252/alcohol_stock.git
+
+_______________________________________
+********** Create Virtual env *****
+
+virtualenv venv
+
+********** Activate Virtual env ****
+
+source venv/bin/activate
+
+************************************
+
+pip install num2words
+
+***************************
+pip install pillow
+
+****************migrations******
+python3 manage.py makemigrations
+
+*********** migrate ********
+
+python3 manage.py migrate
+
+
+***** install django ******
+
+pip install django
+
+******** Install Gunicorn ******
+ 
+pip install gunicorn
+
+*********** Deactivate Virtualenv *****
+
+deactivate
+
+************ Create System Socket File for Gunicorn *******
+
+Example:- sudo nano /etc/systemd/system/crenta.in.gunicorn.socket
+
+cd  /etc/systemd/system/
+
+sudo nano alcohol_stock.com.gunicorn.socket
+
+
+
+[Unit]
+Description=alcohol_stock.com.gunicorn socket
+
+[Socket]
+ListenStream=/run/alcohol_stock.com.gunicorn.sock
+
+[Install]
+WantedBy=sockets.target
+
+
+************** Create System Service File for Gunicorn ******
+Syntax:- sudo nano /etc/systemd/system/your_domain.gunicorn.service
+Example:- sudo nano /etc/systemd/system/narayaniorder.com.gunicorn.service
+
+cd  /etc/systemd/system/
+
+sudo nano alcohol_stock.com.gunicorn.service
+
+
+[Unit]
+Description=alcohol_stock.com.gunicorn daemon
+Requires=alcohol_stock.com.gunicorn.socket
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/root/alcohol_stock
+ExecStart=/root/alcohol_stock/venv/bin/gunicorn \
+          --access-logfile - \
+          --workers 3 \
+          --bind unix:/run/alcohol_stock.com.gunicorn.sock \
+          alcohol_stock.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+
+----------------------------------------------------------------
+sudo systemctl start alcohol_stock.com.gunicorn.socket
+
+sudo systemctl start alcohol_stock.com.gunicorn.service
+
+
+-----------------------------------------------------------------
+
+sudo systemctl enable alcohol_stock.com.gunicorn.socket
+
+sudo systemctl enable alcohol_stock.com.gunicorn.service
+
+
+-----------------------------------------------------------------------
+
+sudo systemctl status alcohol_stock.com.gunicorn.socket
+
+sudo systemctl status alcohol_stock.com.gunicorn.service
+
+-------------------------------------------
+
+sudo systemctl daemon-reload
+sudo systemctl restart alcohol_stock.com.gunicorn
+
+
+
+--------------------------------
+
+
+
+****************** Create Virtual Host File ******
+Syntax:- sudo nano /etc/nginx/sites-available/your_domain
+Example:- sudo nano /etc/nginx/sites-available/crenta.in
+
+
+cd /etc/nginx/sites-available
+
+sudo nano alcohol_stock.com
+
+
+
+server{
+    listen 80;
+    listen [::]:80;
+
+    server_name 103.150.136.82 s.tejorder.com www.s.tejorder.com;
+    client_max_body_size 500M;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+
+    location / {
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_pass http://unix:/run/alcohol_stock.com.gunicorn.sock;
+    }    
+}
+
+-----------------------------------------------------
+
+
+########## Enable Virtual Host or Create Symbolic Link of Virtual Host File ########
+
+sudo ln -s /etc/nginx/sites-available/alcohol_stock.com /etc/nginx/sites-enabled/alcohol_stock.com
+
+
+%%%%%%%%%%%%%%%%%%%%% Check Configuration is Correct or Not %%%%%
+
+sudo nginx -t
+
+%%%%%%%%%%%% Restart Nginx %%%%%%%%%
+
+sudo service nginx restart
+
+
+********** restart ******
+
+sudo systemctl daemon-reload
+sudo systemctl restart alcohol_stock.com.gunicorn
+
+
+--------------------------------------- ssl ------------------
+
+sudo certbot --nginx
+
+sudo certbot --nginx -d janmanasnews.com -d www.janmanasnews.com

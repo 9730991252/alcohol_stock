@@ -1,0 +1,74 @@
+{% extends 'home/base.html' %}
+{% block head %}
+{% endblock head %}
+{% block content %}
+{% include 'include/alert.html' %}
+<div>
+    welcome - {{shope.owner_name}}
+</div>
+
+{% include 'include/owner/owner_menu.html' %}
+
+<div id="item_result">
+
+
+
+<div class="container">
+    {% for p in sales %}
+        <div class="card mb-3  bg-success-subtle">
+            <div style="display: flex; justify-content: space-evenly;padding: 0px;" class="card-body text-center fw-bold">
+                <div class="name">{{ p.item.name }}</div>
+                <p class="card-text">नग: {{ p.qty }}</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+
+</div>
+
+
+<style>
+    .footer{
+      background-color: antiquewhite;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 10px;
+      display: flex;
+      .input{
+        width: 95%;
+      }
+    }
+  </style>
+  
+  <div class="footer">
+    <div class="input"><input type="text" class="form-control" oninput="Search_item()" id="item_name" placeholder="Search Item"></div>
+  </div>
+  
+  <script>
+    function check_value(id, stock){
+        qty = document.getElementById('qty'+id).value
+        if (Number(qty) > Number(stock)){
+            document.getElementById('qty'+id).value = stock
+        }
+        if(Number(qty) < 0){
+            document.getElementById('qty'+id).value = 0
+        }
+    }
+    function Search_item(){
+        $.ajax({
+            url: "{% url 'search_item_sales' %}",
+            method: "GET",
+            data:{
+                item_name:document.getElementById('item_name').value,
+                shope_id:'{{shope.id}}'
+            },
+            success: function(res){
+                document.getElementById('item_result').innerHTML = res.t
+            }
+        })
+    }
+</script>
+{% endblock content %}
