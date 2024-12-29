@@ -13,7 +13,7 @@ def search_item (request):
         shope_id = request.GET['shope_id']
         item = ''
         if item_name:
-            item = Item.objects.filter(name__icontains=item_name,shope_id=shope_id)
+            item = Item.objects.filter(name__icontains=item_name,shope_id=shope_id)[:10]
         context={
             'item':item,
             'p':Purchase.objects.filter(shope_id=shope_id).last()
@@ -26,10 +26,9 @@ def search_item_sales (request):
         item_name = request.GET['item_name']
         shope_id = request.GET['shope_id']
         item = []
-        d = ((datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d'))
         if item_name:
-            for i in Item.objects.filter(name__icontains=item_name,shope_id=shope_id):
-                stock = Purchase.objects.filter(item_id=i.id, shope_id=shope_id,date__lte=d).aggregate(Sum('qty'))['qty__sum']
+            for i in Item.objects.filter(name__icontains=item_name,shope_id=shope_id)[:10]:
+                stock = Purchase.objects.filter(item_id=i.id, shope_id=shope_id).aggregate(Sum('qty'))['qty__sum']
                 if stock==None:
                     stock = 0
                     
