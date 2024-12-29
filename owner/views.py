@@ -4,13 +4,24 @@ from .models import *
 from django.views.decorators.csrf import csrf_exempt
 import math
 from datetime import date
+from django.db.models import Avg, Sum, Min, Max
 # Create your views here.
 def owner_home(request):
     if request.session.has_key('owner_mobile'):
         mobile = request.session['owner_mobile']
         shope = Shope.objects.filter(mobile=mobile).first()
+        item_stock = []
+        for i in Item.objects.filter(shope_id=shope.id):
+            stock = Purchase.objects.filter(item_id=i.id, shope_id=shope.id).aggregate(Sum('qty'))['qty__sum']
+            if stock==None:
+                stock = 0
+            s = Sales.objects.filter(item_id=i.id, shope_id=shope.id).aggregate(Sum('qty'))['qty__sum']
+            if s:
+                stock -= int(s)
+            item_stock.append({'name':i.name,'id':i.id,'stock':stock})
         context={
-            'shope':shope
+            'shope':shope,
+            'item_stock':item_stock
         }
         return render(request, 'owner/owner_home.html', context)
     else:
